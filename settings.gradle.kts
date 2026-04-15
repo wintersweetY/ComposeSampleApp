@@ -1,4 +1,4 @@
-pluginManagement {
+﻿pluginManagement {
     repositories {
         google {
             content {
@@ -24,3 +24,16 @@ dependencyResolutionManagement {
 
 rootProject.name = "ComposeSampleApp"
 include(":app")
+include(":core:common")
+include(":core:ui")
+include(":core:designsystem")
+include(":core:network")
+include(":core:database")
+include(":domain")
+include(":data")
+include(":feature:home:api")
+include(":feature:home:impl")
+include(":feature:square:api")
+include(":feature:square:impl")
+include(":feature:mine:api")
+include(":feature:mine:impl")
