@@ -11,6 +11,7 @@ package com.foresightx.composesampleapp.feature.mine.impl
  * @param userId 用户 ID。
  * @param statusMessage 状态提示信息。
  * @param errorMessage 错误信息。
+ * @param isLoggedIn 是否已登录。
  */
 data class MineUiState(
     val phone: String = "",
@@ -21,6 +22,7 @@ data class MineUiState(
     val userId: Long? = null,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
+    val isLoggedIn: Boolean = false,
 )
 
 /**
@@ -46,6 +48,9 @@ sealed interface MineUiIntent {
 
     /** 触发登录并加载用户信息。 */
     data object SubmitLogin : MineUiIntent
+
+    /** 退出登录。 */
+    data object Logout : MineUiIntent
 }
 
 /**

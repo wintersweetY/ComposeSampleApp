@@ -13,8 +13,10 @@ import com.foresightx.composesampleapp.domain.repository.HomeRepository
 import com.foresightx.composesampleapp.domain.repository.MineRepository
 import com.foresightx.composesampleapp.domain.repository.SquareRepository
 import com.foresightx.composesampleapp.domain.usecase.GetHomeTabContentUseCase
+import com.foresightx.composesampleapp.domain.usecase.GetLocalMineProfileUseCase
 import com.foresightx.composesampleapp.domain.usecase.GetSquareTabContentUseCase
 import com.foresightx.composesampleapp.domain.usecase.LoginAndFetchMineProfileUseCase
+import com.foresightx.composesampleapp.domain.usecase.LogoutUseCase
 import com.foresightx.composesampleapp.domain.usecase.SendLoginSmsCodeUseCase
 import dagger.Binds
 import dagger.Module
@@ -104,6 +106,18 @@ object DataProvideModule {
     @Singleton
     fun provideSendLoginSmsCodeUseCase(repository: MineRepository): SendLoginSmsCodeUseCase =
         SendLoginSmsCodeUseCase(repository)
+
+    /** @return 读取本地登录用户信息用例。 */
+    @Provides
+    @Singleton
+    fun provideGetLocalMineProfileUseCase(repository: MineRepository): GetLocalMineProfileUseCase =
+        GetLocalMineProfileUseCase(repository)
+
+    /** @return 退出登录用例。 */
+    @Provides
+    @Singleton
+    fun provideLogoutUseCase(repository: MineRepository): LogoutUseCase =
+        LogoutUseCase(repository)
 }
 
 /**

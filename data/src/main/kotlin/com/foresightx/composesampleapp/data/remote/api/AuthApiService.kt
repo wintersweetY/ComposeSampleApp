@@ -45,4 +45,15 @@ interface AuthApiService {
     suspend fun queryUserDetail(
         @Header("Authorization") token: String,
     ): ApiResultDto<UserDetailResponseDto>
+
+    /**
+     * 退出登录。
+     *
+     * @param token 登录 token。
+     * @return 退出结果。
+     */
+    @POST("v1/user/logout/confirm")
+    suspend fun logout(
+        @Header("Authorization") token: String,
+    ): ApiResultDto<Boolean>
 }

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -71,6 +72,12 @@ private fun MineScreen(
         ) {
             Text("登录并加载我的信息")
         }
+        Button(
+            onClick = { onIntent(MineUiIntent.Logout) },
+            enabled = !uiState.isLoading && uiState.isLoggedIn,
+        ) {
+            Text("退出登录")
+        }
         if (uiState.isLoading) {
             CircularProgressIndicator()
         }
@@ -83,4 +90,40 @@ private fun MineScreen(
             Text(text = error, color = MaterialTheme.colorScheme.error)
         }
     }
+}
+
+/**
+ * 我的页预览（未登录态）。
+ */
+@Preview(showBackground = true, name = "Mine-LoggedOut")
+@Composable
+private fun MineScreenLoggedOutPreview() {
+    MineScreen(
+        uiState = MineUiState(
+            phone = "13800138000",
+            code = "123456",
+            nickName = "未登录",
+            userId = null,
+            isLoggedIn = false,
+            statusMessage = "请输入验证码后登录",
+        ),
+        onIntent = {},
+    )
+}
+
+/**
+ * 我的页预览（已登录态）。
+ */
+@Preview(showBackground = true, name = "Mine-LoggedIn")
+@Composable
+private fun MineScreenLoggedInPreview() {
+    MineScreen(
+        uiState = MineUiState(
+            nickName = "示例用户",
+            userId = 10001L,
+            isLoggedIn = true,
+            statusMessage = "已恢复本地登录状态",
+        ),
+        onIntent = {},
+    )
 }

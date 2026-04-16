@@ -21,3 +21,4 @@
 1. 仓库接口变化：同步更新 `docs/modules/domain.md`。
 2. 数据实现或映射变化：同步更新 `docs/modules/data.md`。
 3. 网络接口定义或响应结构变化：同步更新 `docs/modules/core-network.md` 与 `docs/modules/feature-*.md` 对应页面文档。
+4. 登录态策略变化（本地持久化字段、退出登录链路、token 读写来源）必须同步更新 `docs/modules/data.md` 与 `docs/modules/feature-mine-impl.md`。

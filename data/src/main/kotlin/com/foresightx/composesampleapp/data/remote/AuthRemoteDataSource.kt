@@ -50,4 +50,13 @@ class AuthRemoteDataSource @Inject constructor(
      */
     suspend fun queryUserDetail(token: String): UserDetailResponseDto =
         apiService.queryUserDetail(token).requireData()
+
+    /**
+     * 退出登录。
+     *
+     * @param token 登录 token。
+     * @return true 表示服务端退出成功。
+     */
+    suspend fun logout(token: String): Boolean =
+        apiService.logout(token).requireSuccess().data ?: true
 }

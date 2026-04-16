@@ -2,7 +2,9 @@ package com.foresightx.composesampleapp.feature.mine.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.foresightx.composesampleapp.domain.usecase.GetLocalMineProfileUseCase
 import com.foresightx.composesampleapp.domain.usecase.LoginAndFetchMineProfileUseCase
+import com.foresightx.composesampleapp.domain.usecase.LogoutUseCase
 import com.foresightx.composesampleapp.domain.usecase.SendLoginSmsCodeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -21,9 +23,15 @@ import kotlinx.coroutines.launch
 class MineViewModel @Inject constructor(
     private val loginAndFetchMineProfileUseCase: LoginAndFetchMineProfileUseCase,
     private val sendLoginSmsCodeUseCase: SendLoginSmsCodeUseCase,
+    private val getLocalMineProfileUseCase: GetLocalMineProfileUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MineUiState())
     val uiState: StateFlow<MineUiState> = _uiState.asStateFlow()
+
+    init {
+        loadLocalSession()
+    }
 
     /**
      * 处理用户意图。
@@ -42,6 +50,24 @@ class MineViewModel @Inject constructor(
 
             MineUiIntent.SendSmsCode -> sendSmsCode()
             MineUiIntent.SubmitLogin -> submitLogin()
+            MineUiIntent.Logout -> logout()
+        }
+    }
+
+    private fun loadLocalSession() {
+        viewModelScope.launch {
+            val profile = getLocalMineProfileUseCase()
+            if (profile != null) {
+                _uiState.update {
+                    it.copy(
+                        nickName = profile.nickName.ifBlank { "未命名用户" },
+                        userId = profile.userId,
+                        isLoggedIn = true,
+                        statusMessage = "已恢复本地登录状态",
+                        errorMessage = null,
+                    )
+                }
+            }
         }
     }
 
@@ -91,7 +117,8 @@ class MineViewModel @Inject constructor(
                         isLoading = false,
                         nickName = profile.nickName.ifBlank { "未命名用户" },
                         userId = profile.userId,
-                        statusMessage = null,
+                        isLoggedIn = true,
+                        statusMessage = "登录成功",
                         errorMessage = null,
                     )
                 }
@@ -101,6 +128,35 @@ class MineViewModel @Inject constructor(
                         isLoading = false,
                         statusMessage = null,
                         errorMessage = throwable.message ?: "请求失败，请检查网络与参数",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun logout() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, statusMessage = null, errorMessage = null) }
+            runCatching {
+                logoutUseCase()
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        nickName = "未登录",
+                        userId = null,
+                        code = "",
+                        isLoggedIn = false,
+                        statusMessage = "已退出登录",
+                        errorMessage = null,
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        statusMessage = null,
+                        errorMessage = throwable.message ?: "退出失败，请稍后重试",
                     )
                 }
             }

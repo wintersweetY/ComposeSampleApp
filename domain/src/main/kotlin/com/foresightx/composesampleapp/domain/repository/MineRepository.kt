@@ -22,4 +22,18 @@ interface MineRepository {
      * @return 我的页用户信息。
      */
     suspend fun loginAndFetchProfile(phone: String, code: String): MineProfile
+
+    /**
+     * 获取本地缓存的登录用户信息。
+     *
+     * @return 已缓存的用户信息；未登录返回 null。
+     */
+    suspend fun getLocalProfile(): MineProfile?
+
+    /**
+     * 退出登录并清空本地登录态。
+     *
+     * @return true 表示退出成功（本地已清理）。
+     */
+    suspend fun logout(): Boolean
 }
