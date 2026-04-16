@@ -19,15 +19,17 @@
 3. 涉及依赖装配改动时：必须看 `hilt`。
 4. 每次结构性改动后，需要同步更新相关 Skill 文档。
 5. 每次改动如果影响架构、模块职责、依赖关系、开发流程，必须同步更新 `docs/` 下对应文档。
+6. 模板工程应使用通用命名，不得出现业务品牌词或项目代号残留。
 
 ## 文档同步规则
 1. 全局架构变化：更新 `docs/architecture/overview.md`。
 2. 模块职责或边界变化：更新 `docs/modules/<module>.md`。
 3. Skill 使用方式变化：更新 `docs/skills-guide.md`。
-4. 未更新文档不得视为完成。
+4. 接口链路变化（请求头、baseUrl、DTO、调用流程）：同步更新 `docs/modules/core-network.md` 与对应 feature 模块文档。
+5. 未更新文档不得视为完成。
 
 ## 架构红线
 1. `app` 只做入口和导航组装。
 2. `feature:*:impl` 不得直接依赖 `data`。
 3. `domain` 不得依赖 `data` 或 `feature`。
-4. Hilt Module 按职责放在所属模块，不堆到 `app/di`。
+4. Hilt Module 按职责放在所属模块；`app/di` 仅允许放入口级配置（如运行时环境配置），禁止堆放业务对象装配。

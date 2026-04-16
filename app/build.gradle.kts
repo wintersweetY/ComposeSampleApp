@@ -20,8 +20,24 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://dev-api.foresightx.com.cn/foresightx-ai-pet/\"",
+            )
+            buildConfigField("String", "CHANNEL", "\"compose_dev\"")
+        }
         release {
             isMinifyEnabled = false
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://api.foresightx.com.cn/foresightx-ai-pet/\"",
+            )
+            buildConfigField("String", "CHANNEL", "\"compose_release\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -35,10 +51,14 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 }
 
 dependencies {
+    implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":data"))
     implementation(project(":feature:home:api"))

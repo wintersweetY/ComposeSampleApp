@@ -1,31 +1,29 @@
-﻿package com.foresightx.composesampleapp.feature.mine.impl
+package com.foresightx.composesampleapp.feature.mine.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.foresightx.composesampleapp.domain.usecase.GetMineTabContentUseCase
+import com.foresightx.composesampleapp.domain.usecase.LoginAndFetchMineProfileUseCase
+import com.foresightx.composesampleapp.domain.usecase.SendLoginSmsCodeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * 我的页 ViewModel。
  *
- * @param getMineTabContentUseCase 我的页数据用例。
+ * @param loginAndFetchMineProfileUseCase 登录并查询我的页信息用例。
  */
 @HiltViewModel
 class MineViewModel @Inject constructor(
-    private val getMineTabContentUseCase: GetMineTabContentUseCase,
+    private val loginAndFetchMineProfileUseCase: LoginAndFetchMineProfileUseCase,
+    private val sendLoginSmsCodeUseCase: SendLoginSmsCodeUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MineUiState())
     val uiState: StateFlow<MineUiState> = _uiState.asStateFlow()
-
-    init {
-        onIntent(MineUiIntent.Load)
-    }
 
     /**
      * 处理用户意图。
@@ -34,14 +32,78 @@ class MineViewModel @Inject constructor(
      */
     fun onIntent(intent: MineUiIntent) {
         when (intent) {
-            MineUiIntent.Load -> loadData()
+            is MineUiIntent.ChangePhone -> _uiState.update {
+                it.copy(phone = intent.phone, statusMessage = null, errorMessage = null)
+            }
+
+            is MineUiIntent.ChangeCode -> _uiState.update {
+                it.copy(code = intent.code, statusMessage = null, errorMessage = null)
+            }
+
+            MineUiIntent.SendSmsCode -> sendSmsCode()
+            MineUiIntent.SubmitLogin -> submitLogin()
         }
     }
 
-    private fun loadData() {
+    private fun sendSmsCode() {
+        val current = _uiState.value
+        if (current.phone.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "请输入手机号") }
+            return
+        }
         viewModelScope.launch {
-            val content = getMineTabContentUseCase()
-            _uiState.update { it.copy(title = content.title, subtitle = content.subtitle) }
+            _uiState.update { it.copy(isSendingCode = true, statusMessage = null, errorMessage = null) }
+            runCatching {
+                sendLoginSmsCodeUseCase(current.phone)
+            }.onSuccess { success ->
+                _uiState.update {
+                    it.copy(
+                        isSendingCode = false,
+                        statusMessage = if (success) "验证码已发送，请注意查收" else null,
+                        errorMessage = if (success) null else "验证码发送失败",
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isSendingCode = false,
+                        statusMessage = null,
+                        errorMessage = throwable.message ?: "验证码发送失败，请稍后重试",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun submitLogin() {
+        val current = _uiState.value
+        if (current.phone.isBlank() || current.code.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "请输入手机号和验证码") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, statusMessage = null, errorMessage = null) }
+            runCatching {
+                loginAndFetchMineProfileUseCase(current.phone, current.code)
+            }.onSuccess { profile ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        nickName = profile.nickName.ifBlank { "未命名用户" },
+                        userId = profile.userId,
+                        statusMessage = null,
+                        errorMessage = null,
+                    )
+                }
+            }.onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        statusMessage = null,
+                        errorMessage = throwable.message ?: "请求失败，请检查网络与参数",
+                    )
+                }
+            }
         }
     }
 }

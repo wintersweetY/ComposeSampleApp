@@ -9,6 +9,8 @@
 3. `ViewModel` 必须 `@HiltViewModel` + `@Inject constructor`。
 4. Hilt Module 按职责放在所属模块（例如 `data/di`）。
 5. 禁止回退到手写 `Service Locator`。
+6. 网络对象装配（`OkHttpClient`、`Retrofit`、`ApiService`）应放在业务所属模块（当前为 `data/di`）。
+7. 环境配置值由 `app` 提供，`data` 通过接口注入使用。
 
 ## 构建要求
 - 统一使用稳定 AGP/Gradle/Kotlin/Hilt 版本组合。
