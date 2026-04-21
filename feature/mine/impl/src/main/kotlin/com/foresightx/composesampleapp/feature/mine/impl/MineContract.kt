@@ -8,6 +8,7 @@ package com.foresightx.composesampleapp.feature.mine.impl
  * @param isLoading 是否正在请求。
  * @param isSendingCode 是否正在发送验证码。
  * @param nickName 用户昵称。
+ * @param avatarUrl 用户头像 URL（后端返回）。
  * @param userId 用户 ID。
  * @param statusMessage 状态提示信息。
  * @param errorMessage 错误信息。
@@ -19,6 +20,7 @@ data class MineUiState(
     val isLoading: Boolean = false,
     val isSendingCode: Boolean = false,
     val nickName: String = "未登录",
+    val avatarUrl: String? = null,
     val userId: Long? = null,
     val statusMessage: String? = null,
     val errorMessage: String? = null,

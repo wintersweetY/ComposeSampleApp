@@ -61,6 +61,7 @@ class MineViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         nickName = profile.nickName.ifBlank { "未命名用户" },
+                        avatarUrl = profile.avatar,
                         userId = profile.userId,
                         isLoggedIn = true,
                         statusMessage = "已恢复本地登录状态",
@@ -116,6 +117,7 @@ class MineViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         nickName = profile.nickName.ifBlank { "未命名用户" },
+                        avatarUrl = profile.avatar,
                         userId = profile.userId,
                         isLoggedIn = true,
                         statusMessage = "登录成功",
@@ -144,6 +146,7 @@ class MineViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         nickName = "未登录",
+                        avatarUrl = null,
                         userId = null,
                         code = "",
                         isLoggedIn = false,
